@@ -35,7 +35,7 @@ func services(workingDir, homeDir string) []types.ServiceConfig {
 
 			Build: types.BuildConfig{
 				Context:    path.Join(workingDir, "./dir"),
-				Dockerfile: path.Join(workingDir, "Dockerfile"),
+				Dockerfile: "Dockerfile",
 				Args:       map[string]*string{"foo": strPtr("bar")},
 				Target:     "foo",
 				Network:    "foo",
@@ -513,7 +513,7 @@ services:
   foo:
     build:
       context: /foo/dir
-      dockerfile: /foo/Dockerfile
+      dockerfile: Dockerfile
       args:
         foo: bar
       labels:
@@ -977,7 +977,7 @@ func fullExampleJSON(workingDir string) string {
     "foo": {
       "build": {
         "context": "/foo/dir",
-        "dockerfile": "/foo/Dockerfile",
+        "dockerfile": "Dockerfile",
         "args": {
           "foo": "bar"
         },

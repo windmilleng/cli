@@ -1506,7 +1506,6 @@ services:
     image: web
     build:
       context: ./web
-      dockerfile: ./web/Dockerfile.web
     links:
       - bar
     pid: host`, "/foo/bar")
@@ -1524,7 +1523,6 @@ services:
     image: web
     build:
       context: /foo/web
-      dockerfile: /foo/web/Dockerfile.web
     links:
       - bar
     pid: host`, "/foo/bar")
