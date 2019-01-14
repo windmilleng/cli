@@ -399,6 +399,8 @@ func LoadService(name string, serviceDict map[string]interface{}, workingDir str
 	}
 	serviceConfig.Name = name
 
+	resolveBuildConfig(serviceConfig, workingDir)
+
 	if err := resolveEnvironment(serviceConfig, workingDir, lookupEnv); err != nil {
 		return nil, err
 	}
@@ -441,6 +443,16 @@ func updateEnvironment(environment map[string]*string, vars map[string]*string, 
 		} else {
 			environment[k] = v
 		}
+	}
+}
+
+func resolveBuildConfig(serviceConfig *types.ServiceConfig, workingDir string) {
+	if serviceConfig.Build.Dockerfile != "" && !path.IsAbs(serviceConfig.Build.Dockerfile){
+		serviceConfig.Build.Dockerfile = path.Join(workingDir, serviceConfig.Build.Dockerfile)
+	}
+
+	if serviceConfig.Build.Context != "" && !path.IsAbs(serviceConfig.Build.Context){
+		serviceConfig.Build.Context = path.Join(workingDir, serviceConfig.Build.Context)
 	}
 }
 

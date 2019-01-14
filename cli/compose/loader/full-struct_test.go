@@ -2,6 +2,7 @@ package loader
 
 import (
 	"fmt"
+	"path"
 	"path/filepath"
 	"time"
 
@@ -33,8 +34,8 @@ func services(workingDir, homeDir string) []types.ServiceConfig {
 			Name: "foo",
 
 			Build: types.BuildConfig{
-				Context:    "./dir",
-				Dockerfile: "Dockerfile",
+				Context:    path.Join(workingDir, "./dir"),
+				Dockerfile: path.Join(workingDir, "Dockerfile"),
 				Args:       map[string]*string{"foo": strPtr("bar")},
 				Target:     "foo",
 				Network:    "foo",
@@ -511,8 +512,8 @@ func fullExampleYAML(workingDir string) string {
 services:
   foo:
     build:
-      context: ./dir
-      dockerfile: Dockerfile
+      context: /foo/dir
+      dockerfile: /foo/Dockerfile
       args:
         foo: bar
       labels:
@@ -975,8 +976,8 @@ func fullExampleJSON(workingDir string) string {
   "services": {
     "foo": {
       "build": {
-        "context": "./dir",
-        "dockerfile": "Dockerfile",
+        "context": "/foo/dir",
+        "dockerfile": "/foo/Dockerfile",
         "args": {
           "foo": "bar"
         },

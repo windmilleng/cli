@@ -22,6 +22,10 @@ func buildConfigDetails(source map[string]interface{}, env map[string]string) ty
 		panic(err)
 	}
 
+	return buildConfigDetailsWithWorkingDir(source, env, workingDir)
+}
+
+func buildConfigDetailsWithWorkingDir(source map[string]interface{}, env map[string]string, workingDir string) types.ConfigDetails {
 	return types.ConfigDetails{
 		WorkingDir: workingDir,
 		ConfigFiles: []types.ConfigFile{
@@ -33,6 +37,15 @@ func buildConfigDetails(source map[string]interface{}, env map[string]string) ty
 
 func loadYAML(yaml string) (*types.Config, error) {
 	return loadYAMLWithEnv(yaml, nil)
+}
+
+func loadYAMLWithWorkingDir(yaml string, workingDir string) (*types.Config, error) {
+	dict, err := ParseYAML([]byte(yaml))
+	if err != nil {
+		return nil, err
+	}
+
+	return Load(buildConfigDetailsWithWorkingDir(dict, nil, workingDir))
 }
 
 func loadYAMLWithEnv(yaml string, env map[string]string) (*types.Config, error) {
@@ -1483,4 +1496,40 @@ func TestTransform(t *testing.T) {
 	assert.NilError(t, err)
 
 	assert.Check(t, is.DeepEqual(samplePortsConfig, ports))
+}
+
+func TestBuildConfigRelativeToWorkingDir(t *testing.T) {
+	actual, err := loadYAMLWithWorkingDir(`
+version: "3"
+services:
+  web:
+    image: web
+    build:
+      context: ./web
+      dockerfile: ./web/Dockerfile.web
+    links:
+      - bar
+    pid: host`, "/foo/bar")
+
+	assert.Equal(t, "/foo/bar/web", actual.Services[0].Build.Context)
+
+	assert.NilError(t, err)
+}
+
+func TestBuildConfigAbsPath(t *testing.T) {
+	actual, err := loadYAMLWithWorkingDir(`
+version: "3"
+services:
+  web:
+    image: web
+    build:
+      context: /foo/web
+      dockerfile: /foo/web/Dockerfile.web
+    links:
+      - bar
+    pid: host`, "/foo/bar")
+
+	assert.Equal(t, "/foo/web", actual.Services[0].Build.Context)
+
+	assert.NilError(t, err)
 }
